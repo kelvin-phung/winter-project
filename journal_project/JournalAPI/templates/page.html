@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button type="button" id="back_button" onclick="location.href='/entries/?page={{back_page}}'">Back</button>
+    <p> Page {{page}} </p>
+    <button type="button" id="next_button" onclick="location.href='/entries/?page={{next_page}}'">Next</button>
+
+    {% if page == 1 %}
+    <script>
+        back_button.style.display = "none";
+    </script>
+    {% else %}
+    <script>
+        back_button.style.display = "block";
+    </script>
+    {% endif %}
+
+    {% if page == max_page %}
+    <script>
+        next_button.style.display = "none";
+    </script>
+    {% else %}
+    <script>
+        next_button.style.display = "block";
+    </script>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'JournalAPI/style.css' %}">
+</head>
+<body>
+    {% include 'filter_form.html' %}
+    <!-- Hidden by default. ID is "filter_form"-->
+    {% block content %}
+
+    {% endblock %}
+
+    <!-- Initial filter -->
+    <button id="filter_button">Filter entries</button>
+    <script> 
+    document.getElementById("filter_button").addEventListener("click", () => {
+        filter_form_container.style.display = "block";
+        filter_button.style.display = "none";
+    })
+
+    document.getElementById("cancel_button").addEventListener("click", () => {
+        filter_form_container.style.display = "none";
+        filter_button.style.display = "block";
+    })
+    </script>
+
+    <!-- Filter functionality if initial filter is complete -->
+    {% if filtered %}
+    <script>
+        filter_form_container.style.display = "block";
+        filter_button.style.display = "none";
+        cancel_button.style.display = "none";
+        return_button.style.display = "block";
+    </script>
+    {% endif %}
+
+    <button onclick="location.href='/home'">Home</button>
+    <br>
+    
+    {% for entry in entries %}
+    - {{ entry.date }} {{ entry.rating }}
+    <button onclick="location.href = '/entry/{{entry.id}}?next={{ request.get_full_path|urlencode }}'" class="button">View description</button>
+    <button onclick="location.href = '/edit-entry/{{entry.id}}?next={{ request.get_full_path|urlencode }}'" class="button">Edit</button>
+    <button onclick="location.href = '/delete-entry/{{entry.id}}?next={{ request.get_full_path|urlencode }}'" class="button">Delete</button>
+    <br>
+    {% endfor %}
+
+    <!-- Page navigation footer -->
+    {% include 'page.html' %}
+    
+    {% block page_footer %}
+    
+    {% endblock %}
+</body>
+</html>

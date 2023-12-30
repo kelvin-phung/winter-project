@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <button name="edit" type="submit" class="button">Edit Entry</button>
+        <button name="cancel" type="button" class="button" onclick="location.href='{{ request.GET.next }}'">Cancel</button>
+    </form>
+
+<script>
+    const form = document.getElementById('form');
+    form.addEventListener("submit", submitHandler);
+
+    function submitHandler(e){
+        e.preventDefault();
+
+        fetch(form.action, {method: 'POST', body: new FormData(form)})
+        .then(response=>response.json())
+    }
+</script>
+</body>
+</html>

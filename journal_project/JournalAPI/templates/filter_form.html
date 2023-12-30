@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'JournalAPI/style.css' %}">
+</head>
+<body>
+    <div id="filter_form_container">
+        <form class="filter_form">
+            Date: <input type="date" name="date" value="{{ date }}"><br>
+            Rating: <input type="number" name="rating" value="{{ rating }}" min="1" max="10" step="1"><br>
+            Description: <input type="text" name="description" value="{{ description }}"><br>
+            <button type="submit">Filter</button>
+            <button type="button" id="cancel_button">Cancel</button>
+            <button type="button" onclick="location.href = '/entries'" id="return_button" style="display: none;">Return to previous entries</button>
+        </form>
+    </div>
+</body>
+</html>

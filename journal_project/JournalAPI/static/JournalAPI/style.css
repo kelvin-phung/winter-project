@@ -1,0 +1,24 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.button{
+    width: 15%;
+    height: 10%;
+    padding: 10px;
+    border-radius: 3px;
+    margin: 20px;
+}
+
+#filter_form_container{
+    display: none;
+    width: 500px;
+}
+
+.filter_form{
+    width: 100%;
+}
