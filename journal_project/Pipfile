@@ -16,6 +16,7 @@ spacy = "*"
 sumy = "*"
 huggingface = "*"
 hugchat = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

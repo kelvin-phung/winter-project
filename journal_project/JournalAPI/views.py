@@ -8,6 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import json
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -40,16 +41,19 @@ def login_user(request):
     if request.user.is_authenticated:
         return redirect(welcome_page)
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        data = json.loads(request.body.decode('utf-8'))
+        username = data['username']
+        password = data['password']
 
         user = authenticate(request, username=username, password=password)
 
         if user:
             login(request, user)
-            return redirect(welcome_page)
+            # return redirect(welcome_page)
+            return JsonResponse({"data": [username, password], "authenticated" : True})
         else:
-            messages.info(request, 'Username or password is incorrect.')
+            # messages.info(request, 'Username or password is incorrect.')
+            return JsonResponse({"data": [username, password], "authenticated" : False})
         
     return render(request, "login.html")
 
