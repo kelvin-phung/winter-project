@@ -26,20 +26,27 @@ from hugchat.login import Login
 
 # Create your views here.
 def register_user(request):
-    if request.user.is_authenticated:
-        return redirect(welcome_page)
+    # if request.user.is_authenticated:
+    #     return redirect(welcome_page)
     form = CreateUserForm()
     if request.method == "POST":
-        form = CreateUserForm(request.POST)
+        form = CreateUserForm(json.loads(request.body.decode('utf-8')))
         if form.is_valid():
             form.save()
-            return redirect(login_user)
+            return JsonResponse({"valid": 1, "u_errors": [], "e_errors": [], "p1_errors": [], "p2_errors": []})
+        else:
+            errors = form.errors
+            u_errors = errors['username'] if 'username' in errors else []
+            e_errors = errors['email'] if 'email' in errors else []
+            p1_errors = errors['password1'] if 'password1' in errors else []
+            p2_errors = errors['password2'] if 'password2' in errors else []
+            return JsonResponse({"valid": 2, "u_errors": u_errors, "e_errors": e_errors, "p1_errors": p1_errors, "p2_errors": p2_errors})
     context = {"form" : form}
     return render(request, "register.html", context)
 
 def login_user(request):
-    if request.user.is_authenticated:
-        return redirect(welcome_page)
+    # if request.user.is_authenticated:
+    #     return redirect(welcome_page)
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
         username = data['username']
@@ -50,10 +57,10 @@ def login_user(request):
         if user:
             login(request, user)
             # return redirect(welcome_page)
-            return JsonResponse({"data": [username, password], "authenticated" : True})
+            return JsonResponse({"data": [username, password], "authenticated" : 1})
         else:
             # messages.info(request, 'Username or password is incorrect.')
-            return JsonResponse({"data": [username, password], "authenticated" : False})
+            return JsonResponse({"data": [username, password], "authenticated" : 2})
         
     return render(request, "login.html")
 
