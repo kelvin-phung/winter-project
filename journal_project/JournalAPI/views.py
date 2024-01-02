@@ -80,7 +80,8 @@ def home_page(request):
 def create_entry(request):
     form = JournalEntryForm()
     if request.method == 'POST':
-        form = JournalEntryForm(request.POST)
+        print(json.loads(request.body.decode('utf-8')))
+        form = JournalEntryForm(json.loads(request.body.decode('utf-8')) | {"user": request.user})
         if form.is_valid():
             cd = form.cleaned_data
             je = JournalEntry(
@@ -90,7 +91,13 @@ def create_entry(request):
                 description = cd['description'],
             )
             je.save()
-            return redirect(successful_entry)
+            return JsonResponse({"valid": 1, "date_errors": [], "rating_errors": [], "desc_errors": []})
+        else:
+            errors = form.errors
+            date_errors = errors['date'] if 'date' in errors else []
+            rating_errors = errors['rating'] if 'rating' in errors else []
+            desc_errors = errors['description'] if 'description' in errors else []
+            return JsonResponse({"valid": 2, "date_errors": date_errors, "rating_errors": rating_errors, "desc_errors": desc_errors})
     context = {"form" : form}
     return render(request, "create_entry.html", context)
 
@@ -101,7 +108,7 @@ def successful_entry(request):
 @login_required(login_url='/login')
 def view_entries(request):
     filtered = False
-    entries = JournalEntry.objects.filter(user=request.user)
+    entries = JournalEntry.objects.filter(user=request.user).values_list('id', 'date', 'rating', 'description')
     # Filter parameters
     date_req = request.GET.get('date')
     rating_req = request.GET.get('rating')
@@ -123,47 +130,61 @@ def view_entries(request):
     entries = entries.order_by('-date')
     max_page = len(entries) // 10 + 1
     # Limit 10 entries shown per page
-    paginator = Paginator(entries, per_page=10)
-    try:
-        entries = paginator.page(number=page)
-    except EmptyPage:
-        raise Http404
+    # paginator = Paginator(entries, per_page=10)
+    # try:
+    #     entries = paginator.page(number=page)
+    # except EmptyPage:
+    #     raise Http404
     
     context = {"entries" : entries, "date" : date_req, "rating" : rating_req, "description" : desc_req, "filtered" : filtered,
                "page" : page, "back_page" : page - 1, "next_page" : page + 1, "max_page" : max_page}
-    return render(request, "view_entries.html", context)
+    print(entries)
+    print(type(entries))
+    return JsonResponse({"entries" : list(entries)})
+    #return render(request, "view_entries.html", context)
 
 @login_required(login_url='/login')
 def view_entry(request, entryID):
-    entry = JournalEntry.objects.get(id=entryID)
+    entry = JournalEntry.objects.filter(id=entryID).values_list('date', 'rating', 'description')
     context = {"entry" : entry}
-    return render(request, "view_entry.html", context)
+    return JsonResponse({"entry" : list(entry)})
+    #return render(request, "view_entry.html", context)
 
 @login_required(login_url='/login')
 def edit_entry(request, entryID):
-    entry = JournalEntry.objects.get(id=entryID)
-    initial_data = {
-        'date': entry.date,
-        'rating': entry.rating,
-        'description': entry.description
-    }
+    # entry = JournalEntry.objects.get(id=entryID)
+    # initial_data = {
+    #     'date': entry.date,
+    #     'rating': entry.rating,
+    #     'description': entry.description
+    # }
     # Prefill form with initial responses
-    form = JournalEntryForm(initial=initial_data)
+    # form = JournalEntryForm(initial=initial_data)
+    print(request)
     if request.method == 'POST':
         # Get URL of previous page
-        next = request.GET.get('next', view_entries)
-        if 'cancel' in request.POST:
-            return redirect(next)
-        form = JournalEntryForm(request.POST)
+        # next = request.GET.get('next', view_entries)
+        # if 'cancel' in request.POST:
+        #     return redirect(next)
+        entry = JournalEntry.objects.get(id=entryID)
+        form = JournalEntryForm(json.loads(request.body.decode('utf-8')) | {"user": request.user})
         if form.is_valid():
             # Update values for entry
-            entry.date = request.POST.get('date')
-            entry.rating = request.POST.get('rating')
-            entry.description = request.POST.get('description')
+            data = json.loads(request.body.decode('utf-8'))
+            entry.date = data['date']
+            entry.rating = data['rating']
+            entry.description = data['description']
             entry.save()
-            return redirect(next)
-    context = {"form" : form}
-    return render(request, "edit_entry.html", context)
+            return JsonResponse({"valid": 1, "date_errors": [], "rating_errors": [], "desc_errors": []})
+            #return redirect(next)
+        else:
+            errors = form.errors
+            date_errors = errors['date'] if 'date' in errors else []
+            rating_errors = errors['rating'] if 'rating' in errors else []
+            desc_errors = errors['description'] if 'description' in errors else []
+            return JsonResponse({"valid": 2, "date_errors": date_errors, "rating_errors": rating_errors, "desc_errors": desc_errors})
+    # context = {"form" : form}
+    # return render(request, "edit_entry.html", context)
 
 @login_required(login_url='/login')
 def delete_entry(request, entryID):

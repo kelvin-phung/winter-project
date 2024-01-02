@@ -18,7 +18,7 @@ export default function Login() {
     useEffect(() => {
         if(error===1){
             console.log('eat');
-            navigate('/register');
+            navigate('/home');
         }
     }, [error, navigate]);
 

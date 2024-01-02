@@ -16,7 +16,7 @@ NUMBER_RATINGS = (
 )
 
 class JournalEntry(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     date = models.DateField()
     rating = models.IntegerField(
         choices = NUMBER_RATINGS,
