@@ -109,23 +109,6 @@ def successful_entry(request):
 def view_entries(request):
     filtered = False
     entries = JournalEntry.objects.filter(user=request.user).values_list('id', 'date', 'rating', 'description')
-    # Filter parameters
-    date_req = request.GET.get('date')
-    rating_req = request.GET.get('rating')
-    desc_req = request.GET.get('description') if request.GET.get('description') else ''
-    if date_req:
-        entries = entries.filter(date=date_req)
-        filtered = True
-    if rating_req:
-        entries = entries.filter(rating=rating_req)
-        filtered = True
-    if desc_req:
-        entries = entries.filter(description__icontains=desc_req)
-        filtered = True
-    if not len(entries): # If filtering parameters yield no results
-        return render(request, "no_filter_results.html")
-    page = int(request.GET.get('page', default=1))
-    
     # Sort entries in reverse chronological order
     entries = entries.order_by('-date')
     max_page = len(entries) // 10 + 1
@@ -136,12 +119,37 @@ def view_entries(request):
     # except EmptyPage:
     #     raise Http404
     
-    context = {"entries" : entries, "date" : date_req, "rating" : rating_req, "description" : desc_req, "filtered" : filtered,
-               "page" : page, "back_page" : page - 1, "next_page" : page + 1, "max_page" : max_page}
-    print(entries)
-    print(type(entries))
+    # context = {"entries" : entries, "date" : date_req, "rating" : rating_req, "description" : desc_req, "filtered" : filtered,
+    #            "page" : page, "back_page" : page - 1, "next_page" : page + 1, "max_page" : max_page}
+    # print(entries)
+    # print(type(entries))
     return JsonResponse({"entries" : list(entries)})
     #return render(request, "view_entries.html", context)
+
+@login_required(login_url='/login')
+def filter_entries(request):
+    # Filter parameters
+    if request.method=='POST':
+        data = json.loads(request.body.decode('utf-8'))
+        date_req = data['date']
+        rating_req = data['rating']
+        desc_req = data['description']
+        entries = JournalEntry.objects.filter(user=request.user)
+        if date_req:
+            entries = entries.filter(date=date_req)
+            # filtered = True
+        if rating_req:
+            entries = entries.filter(rating=rating_req)
+            # filtered = True
+        if desc_req:
+            entries = entries.filter(description__icontains=desc_req)
+            # filtered = True
+        # if not len(entries): # If filtering parameters yield no results
+        #     return render(request, "no_filter_results.html")
+        # page = int(request.GET.get('page', default=1))
+        entries = entries.values_list('id', 'date', 'rating', 'description')
+        entries = entries.order_by('-date')
+        return JsonResponse({"entries": list(entries)})
 
 @login_required(login_url='/login')
 def view_entry(request, entryID):
@@ -188,10 +196,14 @@ def edit_entry(request, entryID):
 
 @login_required(login_url='/login')
 def delete_entry(request, entryID):
-    JournalEntry.objects.get(id=entryID).delete()
+    try:
+        JournalEntry.objects.get(id=entryID).delete()
+        return JsonResponse({"delete" : 1})
+    except:
+        return JsonResponse({"delete" : 2})
     # Get URL of previous page
-    next = request.GET.get('next', view_entries)
-    return redirect(next)
+    # next = request.GET.get('next', view_entries)
+    # return redirect(next)
 
 curr_descriptions = defaultdict(lambda: '')
 curr_keywords = {}

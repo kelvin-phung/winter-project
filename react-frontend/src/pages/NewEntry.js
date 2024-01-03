@@ -61,8 +61,8 @@ export default function NewEntry() {
                 {descErrors.length !== 0 ? <ul>{descErrors.map((error) => <li>{error}</li>)}</ul> : undefined}
                 <br></br>
                 <button>Submit</button>
+                <button type='button' onClick={() => navigate('/home')}>Cancel</button>
             </form>
-            <button onClick={() => navigate('/home')}>Cancel</button>
         </div>
     )
 }

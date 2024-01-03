@@ -8,6 +8,7 @@ urlpatterns = [
     path('logout/', views.logout_user),
     path('home/', views.home_page),
     path('entries/', views.view_entries),
+    path('filter-entries/', views.filter_entries),
     path('entry/<int:entryID>', views.view_entry),
     path('new-entry/', views.create_entry),
     path('entry-success', views.successful_entry),

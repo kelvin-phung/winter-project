@@ -73,6 +73,7 @@ export default function EditEntry() {
                 {descErrors.length !== 0 ? <ul>{descErrors.map((error) => <li>{error}</li>)}</ul> : undefined}
                 <br></br>
                 <button>Submit</button>
+                <button type='button' onClick={() => navigate(-1)}>Cancel</button>
             </form>
         </div>
     )
