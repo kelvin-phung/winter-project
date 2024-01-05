@@ -9,11 +9,14 @@ Axios.defaults.xsrfCookieName = "csrftoken";
 export default function NewEntry() {
     const url = "http://127.0.0.1:8000/new-entry/";
     let navigate = useNavigate();
+    const curr_datetime = new Date()
+    const offset = curr_datetime.getTimezoneOffset()
     const [data, setData] = useState({
-        date: null,
-        rating: 0,
+        date: new Date(curr_datetime.getTime() - (offset*60*1000)).toISOString().split('T')[0],
+        rating: null,
         description: "",
     })
+    console.log(data)
     const [valid, setValid] = useState(0)
     const [dateErrors, setDateErrors] = useState([])
     const [ratingErrors, setRatingErrors] = useState([])

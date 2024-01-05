@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Axios from 'axios';
 import './style.css';
 
-export default function FilterForm({open, onClose, filterSubmit, forceRender}) {
+export default function FilterForm({open, onClose, setEntries, submitted, filterPage, filterSubmit, filterCurrPage, filterMaxPage, forceRender}) {
     const url = 'http://127.0.0.1:8000/filter-entries/'
     const [data, setData] = useState({
         date: null,
@@ -10,13 +10,26 @@ export default function FilterForm({open, onClose, filterSubmit, forceRender}) {
         description: null,
     })
     
+    useEffect(() => {
+        Axios.post(url + '?page=' + filterPage, {
+            date: data.date,
+            rating: data.rating,
+            description: data.description,
+        })
+        .then(response => {
+            setEntries(response.data['entries'])
+            console.log(filterPage)
+        })
+    }, [filterPage])
+
     if(!open){
         return null
     }
 
     function submit(e){
         e.preventDefault();
-        Axios.post(url, {
+        submitted(true)
+        Axios.post(url + '?page=1', {
             date: data.date,
             rating: data.rating,
             description: data.description,
@@ -24,6 +37,7 @@ export default function FilterForm({open, onClose, filterSubmit, forceRender}) {
         .then(response => {
             console.log(response.data['entries'])
             filterSubmit(response.data['entries'])
+            filterMaxPage(response.data['max_page'])
         })
     }
 
@@ -47,6 +61,8 @@ export default function FilterForm({open, onClose, filterSubmit, forceRender}) {
             rating: null,
             description: '',
         })
+        filterCurrPage(1)
+        submitted(false)
         forceRender()
     }
 

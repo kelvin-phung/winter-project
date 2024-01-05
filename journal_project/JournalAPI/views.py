@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import json
+import math
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -111,7 +112,12 @@ def view_entries(request):
     entries = JournalEntry.objects.filter(user=request.user).values_list('id', 'date', 'rating', 'description')
     # Sort entries in reverse chronological order
     entries = entries.order_by('-date')
-    max_page = len(entries) // 10 + 1
+    max_page = math.ceil(len(entries)/10)
+    # Pagination
+    page = int(request.GET.get('page'))
+    last_post_index = page * 10
+    first_post_index = last_post_index - 10
+    entries = entries[first_post_index:last_post_index]
     # Limit 10 entries shown per page
     # paginator = Paginator(entries, per_page=10)
     # try:
@@ -123,7 +129,7 @@ def view_entries(request):
     #            "page" : page, "back_page" : page - 1, "next_page" : page + 1, "max_page" : max_page}
     # print(entries)
     # print(type(entries))
-    return JsonResponse({"entries" : list(entries)})
+    return JsonResponse({"entries" : list(entries), "max_page" : max_page})
     #return render(request, "view_entries.html", context)
 
 @login_required(login_url='/login')
@@ -149,7 +155,13 @@ def filter_entries(request):
         # page = int(request.GET.get('page', default=1))
         entries = entries.values_list('id', 'date', 'rating', 'description')
         entries = entries.order_by('-date')
-        return JsonResponse({"entries": list(entries)})
+        max_page = math.ceil(len(entries)/10)
+        # Pagination
+        page = int(request.GET.get('page'))
+        last_post_index = page * 10
+        first_post_index = last_post_index - 10
+        entries = entries[first_post_index:last_post_index]
+        return JsonResponse({"entries": list(entries), "max_page": max_page})
 
 @login_required(login_url='/login')
 def view_entry(request, entryID):

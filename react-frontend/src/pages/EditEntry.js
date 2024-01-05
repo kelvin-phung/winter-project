@@ -32,7 +32,7 @@ export default function EditEntry() {
 
     useEffect(() => {
         if(valid === 1){
-            navigate('/home')
+            navigate('/entries')
         }
     }, [valid])
 
