@@ -24,6 +24,8 @@ nltk.download('punkt')
 nltk.download('stopwords')
 from hugchat import hugchat
 from hugchat.login import Login
+from transformers import AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.1")
 
 # Create your views here.
 def register_user(request):
@@ -223,21 +225,21 @@ curr_summary = {}
 @login_required(login_url='/login')
 def dashboard(request):
     # Visualization of last 10 entries
-    img = BytesIO()
+    # img = BytesIO()
     entries = JournalEntry.objects.filter(user=request.user).order_by('-date')[0:10]
-    dates = [str(entry.date)[5:] for entry in entries]
+    dates = [str(entry.date) for entry in entries]
     dates.reverse()
     ratings = [entry.rating for entry in entries]
     ratings.reverse()
-    plt.plot(dates, ratings)
-    plt.xticks(rotation=45)
-    plt.xlabel('Date')
-    plt.ylabel('Rating')
-    plt.title('Ratings of the past 10 entries')
-    plt.savefig(img, format='png')
-    plt.close()
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode('utf8')
+    # plt.plot(dates, ratings)
+    # plt.xticks(rotation=45)
+    # plt.xlabel('Date')
+    # plt.ylabel('Rating')
+    # plt.title('Ratings of the past 10 entries')
+    # plt.savefig(img, format='png')
+    # plt.close()
+    # img.seek(0)
+    # plot_url = base64.b64encode(img.getvalue()).decode('utf8')
 
     # Top 3 words in entry descriptions
     def extract_keywords(text):
@@ -256,7 +258,8 @@ def dashboard(request):
         prompt = "Provide words of encouragement/advice based on these journal entries from the past 10 days, in <100 words.\n"
         prompt = prompt + text
         chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-        return chatbot.chat(prompt)
+        response = str(chatbot.chat(prompt))
+        return response
     
     global curr_descriptions, curr_keywords, curr_summary
     descriptions = [entry.description for entry in entries]
@@ -270,6 +273,7 @@ def dashboard(request):
     if str(request.user) not in curr_summary:
         curr_summary[str(request.user)] = ''
 
-    context = {"url" : plot_url, "keywords" : curr_keywords[str(request.user)], "summary" : curr_summary[str(request.user)]}
-    
-    return render(request, "dashboard.html", context)
+    #context = {"url" : plot_url, "keywords" : curr_keywords[str(request.user)], "summary" : curr_summary[str(request.user)]}
+    print(curr_keywords[str(request.user)])
+    return JsonResponse({'dates': dates, 'ratings': ratings, 'keywords': curr_keywords[str(request.user)], 'summary': curr_summary[str(request.user)]})
+    #return render(request, "dashboard.html", context)

@@ -12,30 +12,45 @@ export default function ViewEntries() {
     const [currPage, setCurrPage] = useLocalStorage('page', 1)
     const [maxPage, setMaxPage] = useState(1)
     const [openFilterForm, setOpenFilterForm] = useState(false)
-    const [filterSubmitted, setFilterSubmitted] = useState(false)
+    const [filterSubmitted, setFilterSubmitted] = useLocalStorage('filterSubmitted', false)
     const [filterPage, setFilterPage] = useLocalStorage('filterPage', 1)
     const [delSuccess, setDelSuccess] = useState(0)
     const [forceRender, setForceRender] = useState(true)
+    const [forceRender2, setForceRender2] = useState(true)
 
     useEffect(() => {
         console.log('useEffect is running')
         console.log(currPage)
-        Axios.get(url + "?page=" + currPage)
-        .then(response => {
+        if(filterSubmitted){
+            setForceRender2(!(forceRender2))
+            console.log('grah')
+        }
+        else{
+            console.log('well yes')
+            Axios.get(url + "?page=" + currPage)
+            .then(response => {
             setEntries(response.data['entries'])
             setMaxPage(response.data['max_page'])
-        })
+            })
+        }
     }, [forceRender, currPage])
 
     useEffect(() => {
         if(delSuccess === 1){
             console.log('Delete was successful!')
-            if((currPage-1) * 10 + entries.length - 1 <= (maxPage-1)*10){
-                console.log('grah')
-                setCurrPage(currPage-1)
+            if(((currPage-1) * 10 + entries.length - 1 <= (maxPage-1)*10) && (!filterSubmitted)){
+                modifyCurrPage('back')
+            }
+            else if (((filterPage-1) * 10 + entries.length - 1 <= (maxPage-1)*10) && (filterSubmitted)){
+                modifyCurrPage('back')
             }
             else{
-                setForceRender(!(forceRender))
+                if(!filterSubmitted){
+                    setForceRender(!(forceRender))
+                }
+                else{
+                    setForceRender2(!(forceRender2))
+                }
             }
         }
     }, [delSuccess])
@@ -98,8 +113,9 @@ export default function ViewEntries() {
                 {/* Filter form */}
                 <button onClick={() => setOpenFilterForm(true)}>Filter</button>
                 <FilterForm open={openFilterForm} onClose={() => setOpenFilterForm(false)} setEntries={(entries) => setEntries(entries)}
-                submitted={(value) => setFilterSubmitted(value)} filterPage={filterPage} filterSubmit={filterSubmit} filterCurrPage={modifyCurrPage}
-                filterMaxPage={(page) => setMaxPage(page)} forceRender={() => setForceRender(!(forceRender))}></FilterForm>
+                submitted={(value) => setFilterSubmitted(value)} filterPage={filterPage} filterSubmit={filterSubmit} setCurrPage={(page) => setCurrPage(page)}
+                setFilterPage={(page) => setFilterPage(page)} filterMaxPage={(page) => setMaxPage(page)} forceRender={() => setForceRender(!(forceRender))} forceRender2={forceRender2}>
+                </FilterForm>
                 {/* Entries */}
                 {entries.map((entry) => <li>{entry.slice(1).map((field) => <span>{field} </span>)}
                 <button onClick={() => navigate(`/edit-entry/${entry[0]}`)}>Edit</button>

@@ -1,16 +1,19 @@
 import React, {useState, useEffect} from 'react';
 import Axios from 'axios';
 import './style.css';
+import useLocalStorage from './useLocalStorage';
 
-export default function FilterForm({open, onClose, setEntries, submitted, filterPage, filterSubmit, filterCurrPage, filterMaxPage, forceRender}) {
+export default function FilterForm({open, onClose, setEntries, submitted, filterPage, filterSubmit, setCurrPage, setFilterPage, filterMaxPage, forceRender, forceRender2}) {
     const url = 'http://127.0.0.1:8000/filter-entries/'
-    const [data, setData] = useState({
+    const [data, setData] = useLocalStorage('filterFormData', {
         date: null,
         rating: null,
         description: null,
     })
     
     useEffect(() => {
+        console.log(data)
+        console.log('before', filterPage)
         Axios.post(url + '?page=' + filterPage, {
             date: data.date,
             rating: data.rating,
@@ -18,9 +21,10 @@ export default function FilterForm({open, onClose, setEntries, submitted, filter
         })
         .then(response => {
             setEntries(response.data['entries'])
-            console.log(filterPage)
+            filterMaxPage(response.data['max_page'])
+            console.log('filterPage after', filterPage)
         })
-    }, [filterPage])
+    }, [filterPage, forceRender2])
 
     if(!open){
         return null
@@ -59,9 +63,10 @@ export default function FilterForm({open, onClose, setEntries, submitted, filter
         setData({
             date: null,
             rating: null,
-            description: '',
+            description: null,
         })
-        filterCurrPage(1)
+        setCurrPage(1)
+        setFilterPage(1)
         submitted(false)
         forceRender()
     }
