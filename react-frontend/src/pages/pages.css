@@ -6,6 +6,53 @@
     align-items: center;
     justify-content: center;
     align-content: center;
+    background-color: #a8c49a;
+}
+
+.home-container {
+    height: 50%;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    border-radius: 0.5em;
+    border-width: 5px;
+    border-style: solid;
+    border-color: bisque;
+    background-color: white;
+    padding: 10px;
+}
+
+/* Forms */
+.form-container {
+    height: 50%;
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5em;
+    border-width: 5px;
+    border-style: solid;
+    border-color: bisque;
+    background-color: white;
+    padding: 10px;
+}
+
+#register {
+    height: 65%;
+    width: 25%
+}
+
+.error {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    background-color: rgb(216, 139, 139);
+    padding: 3px;
+    border-radius: 0.5em;
+    max-width: 90%;
 }
 
 /* Dashboard */
@@ -30,16 +77,16 @@
 }
 
 .plot-container {
-    width: 92%;
-    height: 20rem;
+    width: 80%;
+    height: 35%;
 }
 
 .words-container {
-    width: 50%;
-    height: 20rem;
+    width: 47%;
+    height: 40%;
 }
 
 .summary-container {
-    width: 40%;
-    height: 20rem;
+    width: 30%;
+    height: 40%;
 }

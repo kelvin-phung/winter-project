@@ -16,6 +16,12 @@ export default function Login() {
     const [error, setError] = useState(0)
 
     useEffect(() => {
+        localStorage.setItem('page', JSON.stringify(1))
+        localStorage.setItem('filterPage', JSON.stringify(1))
+        localStorage.setItem('filterSubmitted', JSON.stringify(false))
+    }, [])
+    
+    useEffect(() => {
         if(error===1){
             console.log('eat');
             navigate('/home');
@@ -43,17 +49,22 @@ export default function Login() {
     }
 
     return (
-        <div>
-            <form onSubmit={(e) => submit(e)}>
-                <CSRFTOKEN />
-                Username: <input onChange={(e)=>handle(e)} id="username" value={data.username} type="text"></input>
-                <br></br>
-                Password: <input onChange={(e)=>handle(e)} id="password" value={data.password} type="text"></input>
-                <br></br>
-                <button>Login</button>
-                {error===2 ? <p>Username or password is incorrect!</p> : undefined}
-                <p>Don't have an account? </p><Link to='/register'>Register here.</Link>
-            </form>
+        <div className='container'>
+            <div className='form-container'>
+                <form onSubmit={(e) => submit(e)}>
+                    <CSRFTOKEN />
+                    Username: <input onChange={(e)=>handle(e)} id="username" value={data.username} type="text"></input>
+                    <br></br>
+                    Password: <input type="password" name="password" onChange={(e)=>handle(e)} id="password" value={data.password}></input>
+                    <br></br>
+                    <button>Login</button>
+                    <br></br>
+                    {error===2 ? <p className='error'>Username or password is incorrect!</p> : <br></br>}
+                    <br></br>
+                    <br></br>
+                    <p>Don't have an account? </p><Link to='/register'>Register here.</Link>
+                </form>
+            </div>
         </div>
     )
 }

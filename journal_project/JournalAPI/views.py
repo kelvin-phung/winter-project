@@ -65,11 +65,12 @@ def login_user(request):
             # messages.info(request, 'Username or password is incorrect.')
             return JsonResponse({"data": [username, password], "authenticated" : 2})
         
-    return render(request, "login.html")
+    return JsonResponse({"user": str(request.user)})
 
 def logout_user(request):
     logout(request)
-    return redirect(login_user)
+    #return redirect(login_user)
+    return JsonResponse({"status": "success"})
 
 @login_required(login_url='/login')
 def welcome_page(request):

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import Axios from 'axios';
 import CSRFTOKEN from '../components/CSRF_token';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 Axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 Axios.defaults.xsrfCookieName = "csrftoken";
@@ -55,23 +55,25 @@ export default function Register() {
     }
 
     return (
-        <div>
-            <form onSubmit={(e) => submit(e)}>
-                <CSRFTOKEN />
-                Username: <input onChange={(e)=>handle(e)} id="username" value={data.username} type="text"></input>
-                {userErrors.length !== 0 ? <ul>{userErrors.map((error) => <li>{error}</li>)}</ul> : undefined}
-                <br></br>
-                Email: <input onChange={(e)=>handle(e)} id="email" value={data.email} type="text"></input>
-                {emailErrors.length !== 0 ? <ul>{emailErrors.map((error) => <li>{error}</li>)}</ul> : undefined}
-                <br></br>
-                Password: <input onChange={(e)=>handle(e)} id="password1" value={data.password1} type="text"></input>
-                {pass1Errors.length !== 0 ? <ul>{pass1Errors.map((error) => <li>{error}</li>)}</ul> : undefined}
-                <br></br>
-                Re-enter password: <input onChange={(e)=>handle(e)} id="password2" value={data.password2} type="text"></input>
-                {pass2Errors.length !== 0 ? <ul>{pass2Errors.map((error) => <li>{error}</li>)}</ul> : undefined}
-                <br></br>
-                <button>Register</button>
-            </form>
+        <div className='container'>
+            <div className='form-container' id='register'>
+                <form onSubmit={(e) => submit(e)}>
+                    <CSRFTOKEN />
+                    Username: <input onChange={(e)=>handle(e)} id="username" value={data.username} type="text"></input>
+                    {userErrors.length !== 0 ? <ul>{userErrors.map((error) => <li className='error'>{error}</li>)}</ul> : <br></br>}
+                    Email: <input onChange={(e)=>handle(e)} id="email" value={data.email} type="text"></input>
+                    {emailErrors.length !== 0 ? <ul>{emailErrors.map((error) => <li className='error'>{error}</li>)}</ul> : <br></br>}
+                    Password: <input onChange={(e)=>handle(e)} id="password1" value={data.password1} type="password" name="password"></input>
+                    {pass1Errors.length !== 0 ? <ul>{pass1Errors.map((error) => <li className='error'>{error}</li>)}</ul> : <br></br>}
+                    Re-enter password: <input onChange={(e)=>handle(e)} id="password2" value={data.password2} type="password" name="password"></input>
+                    {pass2Errors.length !== 0 ? <ul>{pass2Errors.map((error) => <li className='error'>{error}</li>)}</ul> : <br></br>}
+                    <button>Register</button>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <p>Already have an account? </p><Link to='/'>Login here.</Link>
+                </form>
+            </div>
         </div>
     )
 }
